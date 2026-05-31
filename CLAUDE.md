@@ -6,6 +6,9 @@ Top-down fort, wall-mounted cannons, rally-commanded troops, historical heroes, 
 Mexican-Army assault waves. Jacob is the lead designer/decision-maker. Plays in the browser and
 on iPhone via Safari.
 
+The fort layout follows the real 1836 compound (`docs/historical-alamo.jpg`): the **chapel is the
+SE-corner keep** (final defensive point), not centered. See `ROADMAP.md` (Phase 2 remodel).
+
 ## Ground rules
 - **Validate before claiming done.** State assumptions, verify them, and confirm it actually runs
   (no console errors, no missing-texture boxes) before saying a feature works. Don't rush a "done."

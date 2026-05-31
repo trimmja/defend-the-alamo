@@ -1,5 +1,11 @@
 # Defend the Alamo — Assets
 
+## Layout reference
+`docs/historical-alamo.jpg` ("The Alamo in 1836") is the canonical reference for the fort footprint:
+the long plaza, the **chapel keep in the SE corner**, the Long Barracks inner line, the south
+gate/lunette, and the named gun emplacements (18-pdr SW, 8-pdr north platform, 12-pdrs at the chapel).
+The Phase 2 remodel traces this layout — see `ROADMAP.md`.
+
 ## Phase 1: code-generated textures (no image files)
 All Phase-1 art is generated procedurally in **`src/scenes/BootScene.js`** (`buildTextures()`),
 so the repo has zero external image dependencies and deploys cleanly to GitHub Pages. These are
