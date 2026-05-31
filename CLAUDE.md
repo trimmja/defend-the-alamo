@@ -24,10 +24,13 @@ on iPhone via Safari.
 - `src/systems/` — WaveManager, Economy, Placement.
 - HUDScene runs **in parallel** with GameScene (`scene.launch`) and talks to it via the registry
   / events, not direct coupling.
+- `index.html` loads Phaser (CDN) + `src/main.js` (module); `manifest.webmanifest` + `icons/`
+  provide the "Add to Home Screen" PWA icon (standalone, portrait).
 
 ## Sprite / texture wiring checklist (avoid the "green box" bug)
-Phase 1 art is **code-generated** in `BootScene` (see `ASSETS.md`), so there are no external image
-files yet. When we later swap in real sprite sheets (Kenney / commissioned), follow this every time:
+Phase 1 *gameplay* art is **code-generated** in `BootScene` (see `ASSETS.md`); the only image files
+in the repo are the home-screen icons under `icons/`. When we later swap in real sprite sheets
+(Kenney / commissioned), follow this every time:
 1. Add the file under `assets/`, record path + frame size in **`ASSETS.md`** first.
 2. Load with the **exact** frame width/height in `BootScene.preload`.
 3. Verify the texture key matches what entities request.

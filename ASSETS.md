@@ -25,6 +25,20 @@ intentionally simple but read as real objects (soldiers, cannons, the chapel) �
   `0x4a3f6b` (purple). Defined in `config.js` → `ENEMY_TYPES`.
 - **Texian defenders** (troops): buckskin/blue tint set in `Troop.js`.
 
+## App / home-screen icon
+Pixel-art icon (frontiersman + the Alamo, Texas flag, cannon, defenders) under `icons/`, wired in
+`index.html` (`apple-touch-icon`, favicon) and `manifest.webmanifest` for "Add to Home Screen".
+Generated from a 1254×1254 source via `sips`:
+
+| File | Size | Use |
+|---|---|---|
+| `icons/apple-touch-icon.png` | 180×180 | iOS home-screen icon |
+| `icons/icon-192.png` | 192×192 | PWA manifest |
+| `icons/icon-512.png` | 512×512 | PWA manifest (also `maskable`) |
+| `icons/favicon-32.png` | 32×32 | Browser tab favicon |
+
+To regenerate from a new source image: `sips -z <px> <px> source.png --out icons/<file>`.
+
 ## Swapping in real sprites later (Phase 5 art polish)
 Kenney **"Medieval RTS"** (CC0) fits the top-down fort + soldiers theme well (top-down troops,
 walls, towers, cannons), as does commissioned art. To swap:

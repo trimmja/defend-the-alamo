@@ -21,8 +21,10 @@ with respect.
 | Orientation | Portrait |
 | First hero | Davy Crockett — long-range sharpshooter + "Volley" ability |
 
-## Phase 1 — playable vertical slice (CURRENT)
+## Phase 1 — playable vertical slice  (BUILT & DEPLOYED — in playtesting)
 One level, end to end, live on GitHub Pages and playable on iPhone, proving the full loop + one hero.
+Status: shipped to https://trimmja.github.io/defend-the-alamo/ with a home-screen app icon; now
+being playtested and balanced (`src/config.js`). Real art still pending (see Phase 5).
 - Scaffold + docs + GitHub Pages deploy (no build step).
 - Fort: outer wall segments (HP + cannon slots), courtyard, inner line, central chapel (HP), repair.
 - Enemies: soldados spawn at edges, path to nearest wall, attack/breach it, then push to the chapel.
@@ -53,7 +55,9 @@ screen shake, victory/defeat cinematics. (Phase 1 ships with code-generated plac
 `ASSETS.md`.)
 
 ## Phase 6 — Mobile polish for distribution
-PWA (add-to-home-screen) on top of the existing GitHub Pages host; later, optional iOS wrap.
+Full PWA on top of the existing GitHub Pages host; later, optional iOS wrap.
+*(Already done in Phase 1: GitHub Pages hosting + home-screen icon & `manifest.webmanifest`
+[standalone, portrait]. Remaining: offline support via a service worker, install polish.)*
 
 ## Open items (tune by playtesting)
 - Starting money / wave counts / costs — balance in `src/config.js`.
