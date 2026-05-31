@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alamo Map Builder</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #16120d;
+      color: #f4e4c1;
+    }
+    body {
+      margin: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
+      min-height: 100vh;
+    }
+    main {
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    canvas {
+      width: min(540px, calc(100vw - 32px));
+      height: auto;
+      border: 1px solid #6d5b42;
+      background: #2b2117;
+      image-rendering: auto;
+    }
+    aside {
+      border-left: 1px solid #3f3324;
+      padding: 16px;
+      overflow: auto;
+      max-height: 100vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #cdbb99;
+      margin-top: 10px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 4px;
+      border: 1px solid #6d5b42;
+      background: #241b12;
+      color: #f4e4c1;
+      border-radius: 6px;
+      padding: 8px;
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+      background: #7a1f1f;
+      border-color: #d4bf91;
+      font-weight: 700;
+    }
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .hint {
+      color: #a99a80;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    @media (max-width: 900px) {
+      body { grid-template-columns: 1fr; }
+      aside { max-height: none; border-left: 0; border-top: 1px solid #3f3324; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <canvas id="canvas" width="540" height="960"></canvas>
+  </main>
+  <aside>
+    <h1>Alamo Map Builder</h1>
+    <p class="hint">Drag a piece on the canvas. Use the fields to tune exact size and position, then copy the exported JSON back into map/config data.</p>
+    <label>Selected Piece
+      <select id="piece"></select>
+    </label>
+    <div class="row">
+      <label>X <input id="x" type="number"></label>
+      <label>Y <input id="y" type="number"></label>
+    </div>
+    <div class="row">
+      <label>Width <input id="w" type="number"></label>
+      <label>Height <input id="h" type="number"></label>
+    </div>
+    <div class="row">
+      <label>Sheet
+        <select id="key">
+          <option value="alamo-walls">alamo-walls</option>
+          <option value="alamo-structures">alamo-structures</option>
+        </select>
+      </label>
+      <label>Frame <input id="frame" type="number" min="0" max="15"></label>
+    </div>
+    <button id="duplicate">Duplicate Selected</button>
+    <button id="delete">Delete Selected</button>
+    <label>Export
+      <textarea id="export" spellcheck="false"></textarea>
+    </label>
+  </aside>
+  <script type="module">
+    const canvas = document.querySelector('#canvas');
+    const ctx = canvas.getContext('2d');
+    const controls = Object.fromEntries(['piece', 'x', 'y', 'w', 'h', 'key', 'frame', 'export']
+      .map((id) => [id, document.querySelector('#' + id)]));
+    const frameSize = 256;
+    const images = {
+      ground: await loadImage('../assets/maps/alamo-ground.png'),
+      'alamo-walls': await loadImage('../assets/tilesets/alamo-walls.png'),
+      'alamo-structures': await loadImage('../assets/tilesets/alamo-structures.png'),
+    };
+    let pieces = [
+      { id:'nw-corner', key:'alamo-walls', frame:2, x:92, y:168, w:84, h:84 },
+      { id:'ne-corner', key:'alamo-walls', frame:3, x:458, y:168, w:84, h:84 },
+      { id:'west-sw-corner', key:'alamo-walls', frame:4, x:92, y:676, w:84, h:84 },
+      { id:'south-lunette', key:'alamo-structures', frame:7, x:260, y:825, w:130, h:84 },
+      { id:'chapel-keep', key:'alamo-structures', frame:8, x:432, y:734, w:122, h:136 },
+      { id:'chapel-pad', key:'alamo-structures', frame:11, x:432, y:646, w:80, h:72 },
+      { id:'east-support', key:'alamo-structures', frame:12, x:454, y:462, w:38, h:92 },
+      { id:'north-wall-w', key:'alamo-walls', frame:0, x:150, y:168, w:168, h:62 },
+      { id:'north-battery', key:'alamo-walls', frame:0, x:270, y:168, w:184, h:62 },
+      { id:'north-wall-e', key:'alamo-walls', frame:0, x:392, y:168, w:156, h:62 },
+      { id:'west-upper', key:'alamo-walls', frame:1, x:82, y:310, w:62, h:330 },
+      { id:'west-lower', key:'alamo-walls', frame:1, x:86, y:544, w:62, h:300 },
+      { id:'sw-18pdr', key:'alamo-structures', frame:10, x:136, y:694, w:160, h:142 },
+      { id:'south-gate', key:'alamo-walls', frame:10, x:260, y:750, w:176, h:78 },
+      { id:'south-palisade', key:'alamo-structures', frame:6, x:333, y:654, w:62, h:160 },
+      { id:'long-barracks', key:'alamo-structures', frame:9, x:404, y:414, w:112, h:420 },
+    ];
+    let selected = pieces[0];
+    let drag = null;
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+    function drawPiece(p) {
+      const img = images[p.key];
+      const sx = (p.frame % 4) * frameSize;
+      const sy = Math.floor(p.frame / 4) * frameSize;
+      ctx.drawImage(img, sx, sy, frameSize, frameSize, p.x - p.w / 2, p.y - p.h / 2, p.w, p.h);
+      if (p === selected) {
+        ctx.strokeStyle = '#ffe08a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x - p.w / 2, p.y - p.h / 2, p.w, p.h);
+      }
+    }
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(images.ground, 0, 0);
+      pieces.forEach(drawPiece);
+      controls.export.value = JSON.stringify(pieces, null, 2);
+      syncControls();
+    }
+    function syncControls() {
+      controls.piece.innerHTML = '';
+      pieces.forEach((p, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = p.id;
+        option.selected = p === selected;
+        controls.piece.append(option);
+      });
+      for (const key of ['x', 'y', 'w', 'h', 'frame']) controls[key].value = Math.round(selected[key]);
+      controls.key.value = selected.key;
+    }
+    function hit(x, y) {
+      for (let i = pieces.length - 1; i >= 0; i--) {
+        const p = pieces[i];
+        if (x >= p.x - p.w / 2 && x <= p.x + p.w / 2 && y >= p.y - p.h / 2 && y <= p.y + p.h / 2) return p;
+      }
+      return null;
+    }
+    function pointer(e) {
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * canvas.width / r.width,
+        y: (e.clientY - r.top) * canvas.height / r.height,
+      };
+    }
+    canvas.addEventListener('pointerdown', (e) => {
+      const p = pointer(e);
+      selected = hit(p.x, p.y) || selected;
+      drag = { dx: p.x - selected.x, dy: p.y - selected.y };
+      canvas.setPointerCapture(e.pointerId);
+      render();
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const p = pointer(e);
+      selected.x = Math.round(p.x - drag.dx);
+      selected.y = Math.round(p.y - drag.dy);
+      render();
+    });
+    canvas.addEventListener('pointerup', () => { drag = null; });
+    controls.piece.addEventListener('change', () => {
+      selected = pieces[Number(controls.piece.value)];
+      render();
+    });
+    for (const id of ['x', 'y', 'w', 'h', 'frame']) {
+      controls[id].addEventListener('input', () => {
+        selected[id] = Number(controls[id].value);
+        render();
+      });
+    }
+    controls.key.addEventListener('change', () => {
+      selected.key = controls.key.value;
+      render();
+    });
+    document.querySelector('#duplicate').addEventListener('click', () => {
+      const copy = { ...selected, id: selected.id + '-copy', x: selected.x + 12, y: selected.y + 12 };
+      pieces.push(copy);
+      selected = copy;
+      render();
+    });
+    document.querySelector('#delete').addEventListener('click', () => {
+      if (pieces.length <= 1) return;
+      pieces = pieces.filter((p) => p !== selected);
+      selected = pieces[0];
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>

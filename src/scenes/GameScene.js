@@ -17,7 +17,7 @@ export default class GameScene extends Phaser.Scene {
     const { WIDTH, HEIGHT } = GAME;
     this.gameEnded = false;
 
-    this.add.tileSprite(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 'ground').setDepth(0);
+    this.add.image(WIDTH / 2, HEIGHT / 2, 'alamo-ground').setDepth(0);
 
     this.enemies = [];
     this.troops = [];

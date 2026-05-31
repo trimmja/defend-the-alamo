@@ -19,6 +19,10 @@ class WallSegment {
     this.cy = def.cy;
     this.outward = def.outward;
     this.cannon = null;
+    this.visual = null;
+    this.visualFrame = def.visual ? def.visual.frame : null;
+    this.damagedFrame = def.visual ? def.visual.damagedFrame : null;
+    this.breachFrame = def.visual ? def.visual.breachFrame : null;
 
     // Metadata for the upgrade panel (Phase 2).
     const meta = FORT.EMPLACEMENTS[def.id] || {};
@@ -26,7 +30,14 @@ class WallSegment {
     this.tierCeil = meta.tierCeil || 1;
     this.label = meta.label || def.id;
 
-    this.sprite = scene.add.tileSprite(def.cx, def.cy, def.w, def.h, 'stone').setDepth(5);
+    if (def.visual) {
+      this.visual = scene.add.image(def.visual.x, def.visual.y, def.visual.key, def.visual.frame)
+        .setDepth(4);
+      this.visual.displayWidth = def.visual.w;
+      this.visual.displayHeight = def.visual.h;
+    }
+
+    this.sprite = scene.add.rectangle(def.cx, def.cy, def.w, def.h, 0xffffff, 0.001).setDepth(5);
     this.sprite.setInteractive();
     this.slot = scene.add.image(def.slotX, def.slotY, 'slot').setDepth(6);
     this.slot.setInteractive({ useHandCursor: true });
@@ -46,12 +57,14 @@ class WallSegment {
     if (this.hp <= 0) {
       this.hp = 0;
       this.alive = false;
-      this.sprite.setAlpha(0.18);
+      this.sprite.setAlpha(0.001);
       this.slot.setAlpha(0.5);
+      if (this.visual) {
+        this.visual.setFrame(this.breachFrame).setAlpha(1);
+      }
     } else {
       const f = this.hp / this.maxHp;
-      this.sprite.setTint(Phaser.Display.Color.GetColor(
-        255 * (0.55 + 0.45 * f), 255 * (0.5 + 0.5 * f), 255 * (0.45 + 0.55 * f)));
+      if (this.visual && f <= 0.45) this.visual.setFrame(this.damagedFrame);
     }
     this.drawBar();
   }
@@ -61,10 +74,11 @@ class WallSegment {
     this.hp = Math.min(this.maxHp, this.hp + amount);
     if (this.hp > 0 && !this.alive) {
       this.alive = true;
-      this.sprite.setAlpha(1);
+      this.sprite.setAlpha(0.001);
       this.slot.setAlpha(1);
     }
-    if (this.hp >= this.maxHp) this.sprite.clearTint();
+    const f = this.hp / this.maxHp;
+    if (this.visual) this.visual.setFrame(f <= 0.45 ? this.damagedFrame : this.visualFrame);
     this.drawBar();
     return true;
   }
@@ -84,7 +98,9 @@ class Chapel {
     this.maxHp = FORT.CHAPEL_HP;
     this.hp = FORT.CHAPEL_HP;
     this.alive = true;
-    this.sprite = scene.add.image(x, y, 'chapel').setDepth(4).setScale(0.85);
+    this.sprite = scene.add.image(x, y, 'alamo-structures', 8).setDepth(4);
+    this.sprite.displayWidth = FORT.CHAPEL.w;
+    this.sprite.displayHeight = FORT.CHAPEL.h;
     this.bar = new HealthBar(scene, 90, 7, -80, 8);
     this.drawBar();
   }
@@ -106,7 +122,7 @@ export default class Fort {
     this.scene = scene;
     this.segments = [];
     this.segmentMap = {};
-    this.drawGroundPlan();
+    this.drawStructures();
 
     for (const def of FORT.SEGMENTS) {
       const seg = new WallSegment(scene, def);
@@ -121,25 +137,14 @@ export default class Fort {
     this.chapel = { x: chapelX, y: chapelY };
   }
 
-  drawGroundPlan() {
-    const plaza = FORT.DECOR.PLAZA;
-    this.scene.add.rectangle(plaza.x, plaza.y, plaza.w, plaza.h, 0xd8b980, 0.32)
-      .setStrokeStyle(2, 0x9d8055, 0.35).setDepth(1);
-
-    const g = this.scene.add.graphics().setDepth(3);
-    g.lineStyle(5, 0x6b6052, 0.65);
-    for (const l of FORT.DECOR.LUNETTES) {
-      g.beginPath();
-      g.arc(l.x, l.y, l.r, l.start, l.end, false);
-      g.strokePath();
+  drawStructures() {
+    for (const obj of FORT.STRUCTURES) {
+      const sprite = this.scene.add.image(obj.x, obj.y, obj.key, obj.frame)
+        .setDepth(3);
+      sprite.displayWidth = obj.w;
+      sprite.displayHeight = obj.h;
+      if (obj.rotation) sprite.rotation = obj.rotation;
     }
-
-    // Long Barracks mass and Crockett palisade read as landmarks without
-    // becoming separate damage targets.
-    this.scene.add.rectangle(424, 406, 34, 374, 0xb89a6c, 0.45)
-      .setStrokeStyle(2, 0x806a4c, 0.45).setDepth(2);
-    this.scene.add.rectangle(360, 650, 12, 156, 0x6b4a2b, 0.65)
-      .setStrokeStyle(1, 0x3a2615, 0.5).setDepth(2);
   }
 
   isInside(x, y) {

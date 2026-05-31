@@ -1,4 +1,4 @@
-// BootScene — generates all textures in code (no external image files in Phase 1).
+// BootScene — generates small runtime textures in code.
 // See ASSETS.md for the catalog + the swap-in path for real sprites later.
 import { GAME } from '../config.js';
 
@@ -15,6 +15,15 @@ export default class BootScene extends Phaser.Scene {
     this.load.on('progress', (p) => {
       bar.clear().fillStyle(0xe8d3a1, 1)
         .fillRect((WIDTH - barW) / 2, HEIGHT / 2 - 8, barW * p, 16);
+    });
+    this.load.image('alamo-ground', 'assets/maps/alamo-ground.png');
+    this.load.spritesheet('alamo-structures', 'assets/tilesets/alamo-structures.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
+    this.load.spritesheet('alamo-walls', 'assets/tilesets/alamo-walls.png', {
+      frameWidth: 256,
+      frameHeight: 256,
     });
   }
 

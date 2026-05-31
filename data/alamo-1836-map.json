@@ -1,0 +1,56 @@
+{
+  "name": "alamo-1836",
+  "size": { "width": 540, "height": 960 },
+  "engine": "Phaser",
+  "mode": "scene_mode",
+  "visualModel": "layered_raster",
+  "runtimeObjectModel": "interactive_scene_objects",
+  "collisionModel": "precise_shapes",
+  "layers": {
+    "foundation": "assets/maps/alamo-ground.png",
+    "walls": "assets/tilesets/alamo-walls.png",
+    "structures": "assets/tilesets/alamo-structures.png"
+  },
+  "wallFrames": {
+    "horizontalStraight": 0,
+    "verticalStraight": 1,
+    "northwestCorner": 2,
+    "northeastCorner": 3,
+    "southwestCorner": 4,
+    "southeastCorner": 5,
+    "horizontalEndLeft": 6,
+    "horizontalEndRight": 7,
+    "verticalEndTop": 8,
+    "verticalEndBottom": 9,
+    "horizontalGate": 10,
+    "verticalGate": 11,
+    "horizontalDamaged": 12,
+    "verticalDamaged": 13,
+    "horizontalBreach": 14,
+    "verticalBreach": 15
+  },
+  "structureFrames": {
+    "horizontalWall": 0,
+    "verticalWall": 1,
+    "corner": 2,
+    "gate": 3,
+    "damagedWall": 4,
+    "breachedWall": 5,
+    "palisade": 6,
+    "lunette": 7,
+    "chapel": 8,
+    "longBarracks": 9,
+    "southwestBastion": 10,
+    "emplacementPad": 11,
+    "buttress": 12,
+    "ladder": 13,
+    "rubble": 14,
+    "scrubRock": 15
+  },
+  "runtimeGeometrySource": "src/config.js",
+  "notes": [
+    "Foundation image contains terrain only.",
+    "Walls, chapel, barracks, gates, palisade, and damage states are separate runtime sprites.",
+    "Wall HP, cannon slots, assault lanes, and repair state are driven by src/config.js and entity code."
+  ]
+}

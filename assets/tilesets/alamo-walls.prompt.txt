@@ -1,0 +1,21 @@
+Use the two visible images above as visual references for style and palette: modern pixel-inspired HD top-down game art, warm dusty Texas terrain, pale adobe/limestone walls, crisp chunky silhouettes, subtle shadows, mobile-readable. Generate a new modular wall-tiles spritesheet, exact 4x4 grid on solid #FF00FF magenta background. Each cell must contain one centered reusable Alamo adobe/limestone wall module with generous magenta padding, no edge touching, no labels, no text, no arrows, no UI.
+
+This sheet is for assembling a destructible fort in Phaser, so include complete connection grammar. Row-major cells:
+1 horizontal straight wall module
+2 vertical straight wall module
+3 northwest outside corner wall
+4 northeast outside corner wall
+5 southwest outside corner wall
+6 southeast outside corner wall
+7 horizontal wall end cap left
+8 horizontal wall end cap right
+9 vertical wall end cap top
+10 vertical wall end cap bottom
+11 horizontal wooden gate in stone wall
+12 vertical wooden gate in stone wall
+13 horizontal damaged cracked wall
+14 vertical damaged cracked wall
+15 horizontal breached rubble gap / passable opening
+16 vertical breached rubble gap / passable opening
+
+All wall modules should share the same apparent wall thickness and stone size so they connect cleanly when placed next to each other. Pixel-inspired, not photorealistic, not 3D render, no characters, no cannons, no flags, no modern objects. Solid #FF00FF background only.

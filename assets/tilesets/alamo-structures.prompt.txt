@@ -1,0 +1,23 @@
+Use the visible foundation map style above as the visual context: modern pixel-inspired HD top-down tactical/tower-defense game art, warm dusty Texas palette, pale adobe/limestone, crisp chunky silhouettes, subtle shadows, readable on mobile.
+
+Create a 4x4 modular structure spritesheet on a solid #FF00FF magenta background, exact square sheet, clean separation between cells. No labels, no text, no arrows, no UI. Each cell contains one centered top-down/very slight 3/4 game asset with generous magenta padding and no edge touching. Assets must match the Alamo 1836 map style and be usable as separate runtime objects in Phaser.
+
+Grid contents, row-major:
+1 horizontal adobe/limestone wall segment, straight, intact
+2 vertical adobe/limestone wall segment, straight, intact
+3 adobe wall corner / angled connector piece
+4 wooden gate set into low stone wall
+5 damaged horizontal wall segment, cracked but standing
+6 breached rubble gap, broken wall debris passable
+7 vertical dark wooden palisade fence segment
+8 curved low stone lunette arc segment
+9 Alamo chapel building sprite, southeast keep, iconic facade, top-down game object
+10 Long Barracks / convento rectangular building module, long narrow adobe roof/walls
+11 southwest artillery bastion / square wall platform module
+12 small cannon emplacement pad / stone ring
+13 adobe support buttress / wall pillar
+14 wooden ladder leaning against wall, for future climb/breach state
+15 rubble pile / repair material stack
+16 empty compact scrub/rock prop matching terrain
+
+Solid #FF00FF background only; no drop shadow outside the asset cells except subtle asset shadow on transparent/magenta area; no characters, cannons, flags, blood, modern objects, labels, or callouts.

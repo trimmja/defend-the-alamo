@@ -32,9 +32,9 @@ SE-corner keep** (final defensive point), not centered. See `ROADMAP.md` (Phase 
   provide the "Add to Home Screen" PWA icon (standalone, portrait).
 
 ## Sprite / texture wiring checklist (avoid the "green box" bug)
-Phase 1 *gameplay* art is **code-generated** in `BootScene` (see `ASSETS.md`); the only image files
-in the repo are the home-screen icons under `icons/`. When we later swap in real sprite sheets
-(Kenney / commissioned), follow this every time:
+The map is layered: a foundation-only terrain image plus separate runtime structure sprites (see
+`ASSETS.md`). Small unit/projectile/UI sprites are still **code-generated** in `BootScene`. When we
+later swap in more real sprite sheets (Kenney / commissioned), follow this every time:
 1. Add the file under `assets/`, record path + frame size in **`ASSETS.md`** first.
 2. Load with the **exact** frame width/height in `BootScene.preload`.
 3. Verify the texture key matches what entities request.
