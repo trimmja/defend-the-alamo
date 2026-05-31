@@ -1,7 +1,7 @@
 // HUDScene — overlay UI that runs in parallel with GameScene. Top bar shows
 // money / wave / chapel health / pause; the bottom bar has thumb-friendly
 // buttons. Reads game state via this.scene.get('Game') and its event emitter.
-import { GAME, ECON } from '../config.js';
+import { GAME, ECON, CANNON } from '../config.js';
 
 export default class HUDScene extends Phaser.Scene {
   constructor() {
@@ -43,7 +43,7 @@ export default class HUDScene extends Phaser.Scene {
     // --- bottom bar ---
     this.add.rectangle(WIDTH / 2, HEIGHT - 58, WIDTH, 118, 0x2a1c10, 0.62).setDepth(1000);
     this.hint = this.add.text(WIDTH / 2, HEIGHT - 124,
-      `Tap a wall ring to build a cannon  ($${ECON.CANNON_COST})   ·   Tap a cracked wall to repair  ($${ECON.REPAIR_COST})`, {
+      `Tap a wall ring to build/upgrade cannon  ($${CANNON.TIERS[1].cost}+)   ·   Tap a cracked wall to repair  ($${ECON.REPAIR_COST})`, {
         fontFamily: 'Georgia, serif', fontSize: '13px', color: '#f4e4c1', align: 'center',
       }).setOrigin(0.5).setDepth(1001);
 

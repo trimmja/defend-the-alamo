@@ -5,12 +5,7 @@
 import { FORT } from '../config.js';
 import { HealthBar } from '../utils.js';
 
-// Fort footprint within the portrait playfield (north-up).
-//   N wall (frontline) runs along y=T.
-//   Chapel keep sits in the SE corner; its outer walls form the east/south
-//   perimeter below the Long Barracks.
-const L = 90, R = 446, T = 192, B = 756, TH = 18;
-export const FORT_CENTER = { x: Math.round((L + R) / 2), y: Math.round((T + B) / 2) };
+export const FORT_CENTER = FORT.CENTER;
 
 class WallSegment {
   constructor(scene, def) {
@@ -110,41 +105,50 @@ export default class Fort {
   constructor(scene) {
     this.scene = scene;
     this.segments = [];
+    this.segmentMap = {};
+    this.drawGroundPlan();
 
-    // Each entry maps to a named emplacement in FORT.EMPLACEMENTS.
-    // fx/fy = outer face point (enemies stop here).
-    // slotX/slotY = cannon-slot ring position (inside the fort).
-    // outward = barrel-facing angle for a cannon placed here.
-    const defs = [
-      // --- North wall (frontline, 8-pdr battery) -------------------------
-      { id:'north-wall-w',   cx:149, cy:T,   w:118, h:TH,  fx:149, fy:T-14, slotX:149, slotY:T+24,  outward:-Math.PI/2 },
-      { id:'north-battery',  cx:268, cy:T,   w:120, h:TH,  fx:268, fy:T-14, slotX:268, slotY:T+24,  outward:-Math.PI/2 },
-      { id:'north-wall-e',   cx:387, cy:T,   w:118, h:TH,  fx:387, fy:T-14, slotX:387, slotY:T+24,  outward:-Math.PI/2 },
-      // --- West wall (acequia side) --------------------------------------
-      { id:'west-upper',     cx:L,   cy:313, w:TH,  h:242, fx:L-14, fy:313, slotX:L+24, slotY:313,  outward:Math.PI },
-      { id:'west-lower',     cx:L,   cy:567, w:TH,  h:266, fx:L-14, fy:567, slotX:L+24, slotY:567,  outward:Math.PI },
-      // --- SW emplacement (18-pdr, highest tier, unique to this slot) ----
-      { id:'sw-18pdr',       cx:L,   cy:728, w:TH,  h:56,  fx:L-14, fy:B,   slotX:L+24, slotY:728,  outward:Math.PI*5/6 },
-      // --- South wall (sally port/gate + Crockett's palisade) ------------
-      { id:'south-gate',     cx:153, cy:B,   w:126, h:TH,  fx:153, fy:B+14, slotX:153, slotY:B-24,  outward:Math.PI/2 },
-      { id:'south-palisade', cx:279, cy:B,   w:126, h:TH,  fx:279, fy:B+14, slotX:279, slotY:B-24,  outward:Math.PI/2 },
-      // --- Long Barracks / east wall (inner line, above the chapel) ------
-      { id:'long-barracks',  cx:R,   cy:410, w:TH,  h:436, fx:R+14, fy:410, slotX:R-24, slotY:410,  outward:0 },
-    ];
-
-    for (const def of defs) {
-      this.segments.push(new WallSegment(scene, def));
+    for (const def of FORT.SEGMENTS) {
+      const seg = new WallSegment(scene, def);
+      this.segments.push(seg);
+      this.segmentMap[seg.id] = seg;
     }
 
     // Chapel keep — SE corner. Outer walls form the east/south perimeter
-    // below the Long Barracks (approximately x=342–444, y=628–756).
-    const chapelX = 393, chapelY = 692;
+    // below the Long Barracks.
+    const chapelX = FORT.CHAPEL.x, chapelY = FORT.CHAPEL.y;
     this.chapelObj = new Chapel(scene, chapelX, chapelY);
     this.chapel = { x: chapelX, y: chapelY };
   }
 
+  drawGroundPlan() {
+    const plaza = FORT.DECOR.PLAZA;
+    this.scene.add.rectangle(plaza.x, plaza.y, plaza.w, plaza.h, 0xd8b980, 0.32)
+      .setStrokeStyle(2, 0x9d8055, 0.35).setDepth(1);
+
+    const g = this.scene.add.graphics().setDepth(3);
+    g.lineStyle(5, 0x6b6052, 0.65);
+    for (const l of FORT.DECOR.LUNETTES) {
+      g.beginPath();
+      g.arc(l.x, l.y, l.r, l.start, l.end, false);
+      g.strokePath();
+    }
+
+    // Long Barracks mass and Crockett palisade read as landmarks without
+    // becoming separate damage targets.
+    this.scene.add.rectangle(424, 406, 34, 374, 0xb89a6c, 0.45)
+      .setStrokeStyle(2, 0x806a4c, 0.45).setDepth(2);
+    this.scene.add.rectangle(360, 650, 12, 156, 0x6b4a2b, 0.65)
+      .setStrokeStyle(1, 0x3a2615, 0.5).setDepth(2);
+  }
+
   isInside(x, y) {
-    return x > L && x < R && y > T && y < B;
+    const b = FORT.BOUNDS;
+    return x > b.left && x < b.right && y > b.top && y < b.bottom;
+  }
+
+  segmentById(id) {
+    return this.segmentMap[id] || null;
   }
 
   nearestAliveSegment(x, y) {

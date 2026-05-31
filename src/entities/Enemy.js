@@ -1,13 +1,15 @@
 // Enemy — a Mexican Army soldado. Approaches the nearest intact wall, attacks
 // it until breached, then pushes through to the chapel. Stops to fight any
 // defender (troop/hero) that blocks its path.
-import { ENEMY_TYPES } from '../config.js';
+import { ASSAULT_LANES, ENEMY_TYPES } from '../config.js';
 import { HealthBar, hitFlash } from '../utils.js';
 
 export default class Enemy {
-  constructor(scene, x, y, typeKey) {
+  constructor(scene, x, y, typeKey, laneKey = 'north') {
     this.scene = scene;
     this.typeKey = typeKey;
+    this.laneKey = laneKey;
+    this.lane = ASSAULT_LANES[laneKey] || ASSAULT_LANES.north;
     const t = ENEMY_TYPES[typeKey];
     this.maxHp = t.hp;
     this.hp = t.hp;
@@ -22,6 +24,7 @@ export default class Enemy {
     this.alive = true;
     this.insideFort = false;
     this.segment = null;
+    this.pathIndex = 0;
     this.lastAttack = 0;
     this.bar = new HealthBar(scene, 22, 4, -15);
   }
@@ -70,21 +73,25 @@ export default class Enemy {
     const def = this.scene.nearestDefender(s.x, s.y, 30);
     if (def) { this.attack(def, time); this.drawBar(); return; }
 
-    // 2) Decide structural target.
-    if (!this.segment || !this.segment.alive) {
-      this.segment = fort.nearestAliveSegment(s.x, s.y);
-    }
+    // 2) Follow the assigned historical assault lane before falling back to
+    // nearest-wall behavior for any future custom spawns.
+    if (!this.segment) this.segment = fort.segmentById(this.lane.segment);
+    if (!this.segment && !this.insideFort) this.segment = fort.nearestAliveSegment(s.x, s.y);
     if (fort.isInside(s.x, s.y)) this.insideFort = true;
 
     const goChapel = this.insideFort || !this.segment || !this.segment.alive;
 
     if (goChapel) {
-      const c = fort.chapel;
-      if (Phaser.Math.Distance.Between(s.x, s.y, c.x, c.y) <= 70) {
+      const target = this.lane.path[this.pathIndex] || fort.chapel;
+      if (Phaser.Math.Distance.Between(s.x, s.y, target.x, target.y) > 12) {
+        this.moveTo(target.x, target.y, dt);
+        if (fort.isInside(s.x, s.y)) this.insideFort = true;
+      } else if (this.pathIndex < this.lane.path.length - 1) {
+        this.pathIndex++;
+      } else if (Phaser.Math.Distance.Between(s.x, s.y, fort.chapel.x, fort.chapel.y) <= 70) {
         this.attack(fort.chapelObj, time);
       } else {
-        this.moveTo(c.x, c.y, dt);
-        if (fort.isInside(s.x, s.y)) this.insideFort = true;
+        this.moveTo(fort.chapel.x, fort.chapel.y, dt);
       }
     } else {
       const seg = this.segment;

@@ -1,7 +1,7 @@
 // GameScene — owns the battlefield, all entities, and the update loop. The HUD
 // runs in parallel (launched here) and calls the action methods below.
 import { GAME, ECON, CANNON, FORT } from '../config.js';
-import Fort, { FORT_CENTER } from '../entities/Fort.js';
+import Fort from '../entities/Fort.js';
 import Cannon from '../entities/Cannon.js';
 import Troop from '../entities/Troop.js';
 import Hero from '../entities/Hero.js';
@@ -29,7 +29,7 @@ export default class GameScene extends Phaser.Scene {
     this.fort = new Fort(this);
 
     // Shared rally flag for troops — drag it to move the whole line.
-    this.rallyPoint = { x: FORT_CENTER.x, y: FORT_CENTER.y + 70 };
+    this.rallyPoint = { x: FORT.RALLY.x, y: FORT.RALLY.y };
     this.flag = this.add.image(this.rallyPoint.x, this.rallyPoint.y, 'flag').setDepth(15);
     this.flag.setInteractive({ draggable: true, useHandCursor: true });
     this.input.setDraggable(this.flag);
@@ -60,13 +60,24 @@ export default class GameScene extends Phaser.Scene {
       // Tap a wall slot ring -> build a cannon there.
       seg.slot.on('pointerdown', () => {
         if (this.gameEnded) return;
-        if (seg.cannon) { this.flashMsg('Slot taken'); return; }
-        if (!this.economy.canAfford(ECON.CANNON_COST)) { this.flashMsg('Need $' + ECON.CANNON_COST); return; }
-        this.economy.spend(ECON.CANNON_COST);
-        const c = new Cannon(this, seg.slotX, seg.slotY, seg.outward);
+        if (seg.cannon) {
+          const cost = seg.cannon.nextUpgradeCost;
+          if (!seg.cannon.canUpgrade) { this.flashMsg(seg.label + ' maxed'); return; }
+          if (!this.economy.canAfford(cost)) { this.flashMsg('Need $' + cost); return; }
+          this.economy.spend(cost);
+          seg.cannon.upgrade();
+          this.spawnBurst(seg.slotX, seg.slotY, 0xffe08a, 8);
+          this.flashMsg(CANNON.TIERS[seg.cannon.tier].name);
+          return;
+        }
+        const cost = CANNON.TIERS[1].cost;
+        if (!this.economy.canAfford(cost)) { this.flashMsg('Need $' + cost); return; }
+        this.economy.spend(cost);
+        const c = new Cannon(this, seg.slotX, seg.slotY, seg.outward, seg.tierCeil);
         seg.cannon = c;
         this.cannons.push(c);
         this.spawnBurst(seg.slotX, seg.slotY, 0xffe08a, 5);
+        this.flashMsg(seg.label);
       });
       // Tap a damaged wall -> repair it.
       seg.sprite.on('pointerdown', () => {
@@ -92,7 +103,7 @@ export default class GameScene extends Phaser.Scene {
 
   deployHero() {
     if (this.gameEnded || this.hero) return;
-    this.hero = new Hero(this, FORT_CENTER.x, FORT_CENTER.y - 40);
+    this.hero = new Hero(this, FORT.HERO_DEPLOY.x, FORT.HERO_DEPLOY.y);
     this.events.emit('heroDeployed');
     this.flashMsg('Crockett deployed!');
   }

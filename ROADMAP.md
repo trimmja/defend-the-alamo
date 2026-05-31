@@ -105,7 +105,9 @@ Rebuild the fort to the real compound and add depth to the cannons:
   9 named emplacements with per-slot `tierCeil` values stored in `src/config.js` (`FORT.EMPLACEMENTS`).
 - ✅ **FORT_CENTER updated** — rally flag, hero deploy, and enemy spawn circle all use the new
   compound center (268, 474).
-- ⬜ Cannon upgrade-tier system (ladder: swivel → 6-pdr → 8-pdr → 12-pdr → 18-pdr).
+- ✅ **Historical assault lanes** — waves now spawn from named north, west, and south approaches,
+  breach assigned wall lines, then push across the plaza toward the SE chapel keep.
+- ✅ Cannon upgrade-tier system (ladder: swivel → 6-pdr → 8-pdr → 12-pdr → 18-pdr).
 - ⬜ Tap-to-reveal build/upgrade panel (emplacement name + history blurb + tier stats + cost).
 - ⬜ Opt-in Fort Map / codex overlay.
 

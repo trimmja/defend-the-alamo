@@ -3,9 +3,8 @@
 //  'wave'  -> { current, total }
 //  'prep'  -> secondsRemaining (and 'prepEnd' when a wave starts)
 //  'victory' when the last wave is cleared.
-import { WAVES, WAVE_PREP_MS, ENEMY_TYPES } from '../config.js';
+import { WAVES, WAVE_PREP_MS, ENEMY_TYPES, ASSAULT_LANES } from '../config.js';
 import Enemy from '../entities/Enemy.js';
-import { FORT_CENTER } from '../entities/Fort.js';
 
 export default class WaveManager {
   constructor(scene) {
@@ -26,7 +25,9 @@ export default class WaveManager {
     this.index = i;
     const q = [];
     for (const grp of WAVES[i]) {
-      for (let k = 0; k < grp.count; k++) q.push({ type: grp.type, at: k * grp.gapMs });
+      for (let k = 0; k < grp.count; k++) {
+        q.push({ type: grp.type, lane: grp.lane || 'north', at: k * grp.gapMs });
+      }
     }
     q.sort((a, b) => a.at - b.at);
     this.queue = q;
@@ -37,16 +38,14 @@ export default class WaveManager {
     this.scene.events.emit('prepEnd');
   }
 
-  spawnOne(type) {
-    // Spawn outside the fort at a random bearing, clamped to the playfield.
-    const ang = Phaser.Math.FloatBetween(0, Math.PI * 2);
-    const radius = 330;
-    let x = FORT_CENTER.x + Math.cos(ang) * radius;
-    let y = FORT_CENTER.y + Math.sin(ang) * radius;
+  spawnOne(type, laneKey) {
+    const lane = ASSAULT_LANES[laneKey] || ASSAULT_LANES.north;
+    let x = lane.spawn.x + Phaser.Math.Between(-lane.spawn.jitterX, lane.spawn.jitterX);
+    let y = lane.spawn.y + Phaser.Math.Between(-lane.spawn.jitterY, lane.spawn.jitterY);
     x = Phaser.Math.Clamp(x, 24, this.scene.scale.width - 24);
     y = Phaser.Math.Clamp(y, 108, this.scene.scale.height - 132);
     if (!ENEMY_TYPES[type]) type = 'infantry';
-    this.scene.enemies.push(new Enemy(this.scene, x, y, type));
+    this.scene.enemies.push(new Enemy(this.scene, x, y, type, laneKey));
   }
 
   update(dt, delta) {
@@ -62,7 +61,7 @@ export default class WaveManager {
     // active
     this.elapsed += delta;
     while (this.qpos < this.queue.length && this.queue[this.qpos].at <= this.elapsed) {
-      this.spawnOne(this.queue[this.qpos].type);
+      this.spawnOne(this.queue[this.qpos].type, this.queue[this.qpos].lane);
       this.qpos++;
     }
     // Wave cleared once everything is spawned and all enemies are dead.

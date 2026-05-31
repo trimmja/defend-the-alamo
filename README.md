@@ -6,9 +6,14 @@ against escalating assault waves of the Mexican Army.
 
 **Play it:** https://trimmja.github.io/defend-the-alamo/ (open in Safari on your iPhone)
 
-## Run it locally
-Double-click **`start.command`** — it starts a local server at http://localhost:8080 and prints
-your Mac's LAN IP so you can open it on a phone on the same Wi-Fi.
+## Testing
+Official validation happens on the live GitHub Pages build after pushing to GitHub:
+https://trimmja.github.io/defend-the-alamo/
+
+Jacob tests the live Pages build in browser/iPhone Safari before a feature is considered validated.
+
+For quick local convenience, **`start.command`** starts a local server at http://localhost:8080 and
+prints your Mac's LAN IP so you can open it on a phone on the same Wi-Fi.
 
 > Don't open `index.html` directly with `file://` — browsers block local image/module loads.
 

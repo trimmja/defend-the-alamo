@@ -2,6 +2,7 @@
 // holds at the shared rally flag, auto-attacking any enemy in range. Move the
 // flag to reposition the whole line (advance to the walls or retreat to the chapel).
 import { TROOP } from '../config.js';
+import Projectile from './Projectile.js';
 import { HealthBar, hitFlash } from '../utils.js';
 
 const TROOP_TINT = 0x2f6db0; // Texian blue
@@ -16,6 +17,10 @@ export default class Troop {
     this.sprite._baseTint = TROOP_TINT;
     this.alive = true;
     this.lastAttack = 0;
+    this.holdOffset = {
+      x: Phaser.Math.Between(-TROOP.FORMATION_SPREAD, TROOP.FORMATION_SPREAD),
+      y: Phaser.Math.Between(-TROOP.FORMATION_SPREAD, TROOP.FORMATION_SPREAD),
+    };
     this.bar = new HealthBar(scene, 22, 4, -15);
   }
 
@@ -48,8 +53,10 @@ export default class Troop {
       s.rotation = Phaser.Math.Angle.Between(s.x, s.y, enemy.sprite.x, enemy.sprite.y) + Math.PI / 2;
       if (time - this.lastAttack >= TROOP.ATTACK_MS) {
         this.lastAttack = time;
-        enemy.takeDamage(TROOP.DAMAGE);
-        hitFlash(this.scene, enemy.sprite);
+        this.scene.projectiles.push(new Projectile(this.scene, s.x, s.y, {
+          texture: 'shot', speed: TROOP.PROJECTILE_SPEED, damage: TROOP.DAMAGE, homing: true,
+          target: enemy, aimX: enemy.sprite.x, aimY: enemy.sprite.y,
+        }));
       }
       this.drawBar();
       return;
@@ -57,9 +64,11 @@ export default class Troop {
 
     // Otherwise hold at the rally flag.
     const r = this.scene.rallyPoint;
-    const d = Phaser.Math.Distance.Between(s.x, s.y, r.x, r.y);
+    const tx = r.x + this.holdOffset.x;
+    const ty = r.y + this.holdOffset.y;
+    const d = Phaser.Math.Distance.Between(s.x, s.y, tx, ty);
     if (d > 6) {
-      const ang = Phaser.Math.Angle.Between(s.x, s.y, r.x, r.y);
+      const ang = Phaser.Math.Angle.Between(s.x, s.y, tx, ty);
       s.x += Math.cos(ang) * TROOP.SPEED * dt;
       s.y += Math.sin(ang) * TROOP.SPEED * dt;
       s.rotation = ang + Math.PI / 2;
