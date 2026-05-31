@@ -22,8 +22,20 @@ export const ECON = {
 export const FORT = {
   WALL_HP: 240,
   CHAPEL_HP: 500,
-  // Outer wall is a rectangle of segments; each side has segments with slots.
-  SEGMENTS_PER_SIDE: 2,   // -> 8 segments, 8 cannon slots total
+  // Named emplacements for the historical compound. tierCeil = max upgrade tier
+  // (1=swivel, 2=6-pdr, 3=8-pdr, 4=12-pdr, 5=18-pdr). Used by the upgrade
+  // panel (Phase 2) and cannon-tier system.
+  EMPLACEMENTS: {
+    'north-wall-w':   { label: 'North Wall (West)',        tierCeil: 2 },
+    'north-battery':  { label: 'North Battery (8-pdr)',    tierCeil: 3 },
+    'north-wall-e':   { label: 'North Wall (East)',        tierCeil: 2 },
+    'west-upper':     { label: 'West Wall (Upper)',        tierCeil: 1 },
+    'west-lower':     { label: 'West Wall (Lower)',        tierCeil: 1 },
+    'sw-18pdr':       { label: 'SW Emplacement (18-pdr)',  tierCeil: 5 },
+    'south-gate':     { label: 'South Gate / Lunette',     tierCeil: 2 },
+    'south-palisade': { label: "Crockett's Palisade",      tierCeil: 1 },
+    'long-barracks':  { label: 'Long Barracks',            tierCeil: 2 },
+  },
 };
 
 // --- Cannon ----------------------------------------------------------------

@@ -97,15 +97,17 @@ both are **superseded by the Phase 2 historical remodel** below. Real art still 
 - HUD: top bar (money / wave / chapel + wall health / pause), bottom thumb-friendly build bar, hero
   ability button. Game-over screen with retry.
 
-## Phase 2 — Historical fort remodel & cannon upgrades  (NEXT)
+## Phase 2 — Historical fort remodel & cannon upgrades  (IN PROGRESS)
 Rebuild the fort to the real compound and add depth to the cannons:
-- Replace the symmetric centered-chapel layout with the **faithful irregular footprint** above —
-  long plaza, angled SW corner, **chapel keep in the SE**, Long Barracks as the inner retreat line,
-  south gate / lunette, named emplacements. North-up portrait.
-- Make the chapel the **final keep** (highest HP, lose condition) with its outer walls as east perimeter.
-- Add the **cannon upgrade-tier system** (ladder above) with **per-slot historical ceilings**.
-- Add the **tap-to-reveal build/upgrade panel** (emplacement name + history + tier stats) and the
-  opt-in **Fort Map / codex** overlay.
+- ✅ **Fort layout reworked** — symmetric rectangle replaced with the historical footprint: north
+  wall frontline (3 segments, T3 ceiling), west wall + SW 18-pdr bastion (T5, unique), south gate /
+  lunette + Crockett's palisade, Long Barracks east wall, **chapel keep in the SE corner**.
+  9 named emplacements with per-slot `tierCeil` values stored in `src/config.js` (`FORT.EMPLACEMENTS`).
+- ✅ **FORT_CENTER updated** — rally flag, hero deploy, and enemy spawn circle all use the new
+  compound center (268, 474).
+- ⬜ Cannon upgrade-tier system (ladder: swivel → 6-pdr → 8-pdr → 12-pdr → 18-pdr).
+- ⬜ Tap-to-reveal build/upgrade panel (emplacement name + history blurb + tier stats + cost).
+- ⬜ Opt-in Fort Map / codex overlay.
 
 ## Phase 3 — Content & heroes
 Full hero roster — Travis ("line in the sand" rally buff), Bowie (melee/knife), Bonham, Seguín
@@ -133,6 +135,5 @@ Full PWA on top of the existing GitHub Pages host; later, optional iOS wrap.
 ## Open items (tune by playtesting)
 - Starting money / wave counts / costs — balance in `src/config.js`.
 - Gun-tier stats and per-slot upgrade ceilings — also in `src/config.js`.
-- How literally to trace the irregular walls vs. keeping segments big enough to tap on a small screen.
 - Real art: swap the code-generated placeholders for sprites (Kenney "Medieval RTS" CC0 fits the
   top-down fort + soldiers theme, or commissioned art).

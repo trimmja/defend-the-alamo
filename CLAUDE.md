@@ -42,3 +42,5 @@ in the repo are the home-screen icons under `icons/`. When we later swap in real
 ## Running / testing
 - Local: `start.command` → http://localhost:8080 (never `file://`).
 - Live: push to `main` → https://trimmja.github.io/defend-the-alamo/
+- **Never use Playwright or headless browser automation for testing.** Jacob does all in-browser
+  testing himself. Do not attempt to screenshot or drive the browser programmatically.
